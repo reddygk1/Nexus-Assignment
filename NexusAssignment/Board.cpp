@@ -3,16 +3,17 @@
 #include "Drawer.h"
 #include "Astar.h"
 
+
 Board::Board()
 {
 	initBoard();
 	random = gcnew Random();
+	state = new State;
 }
 
 void Board::initBoard()
 {
-	highScore = 0;
-	highScore = highScore + (ScoreReader());
+	highScore = (ScoreReader());
 	active.x = -1;
 	active.y = -1;
 	activeCellcolour = -1;
@@ -48,6 +49,19 @@ void Board::CheckFreeCells()
 
 		}
 	}
+}
+
+void Board::MovebackAState()
+{
+	if (active.x != -1 && active.y != -1)
+	{
+		mBoard[active.x][active.y] = activeCellcolour;
+		active.x = -1;
+		active.y = -1;
+		activeCellcolour = -1;
+
+	}
+	state->MoveBack(score, mBoard);
 }
 
 void Board::selectCell(int x, int y)
@@ -113,10 +127,11 @@ void Board::ScoreWriter(int x)
 {
 	gcroot<IO::StreamWriter^> sw;
 	sw = gcnew IO::StreamWriter("HighScore.txt");
-	if (x > highScore)
+	if (score > highScore)
 	{
 		sw->WriteLine(x);
-	}	
+	}
+	
 	sw->Close();
 }
 
@@ -402,9 +417,6 @@ bool Board::clear(int x,int y)
 		}
 		score = score + eraseShapes.size()*10;
 	}
-	ScoreWriter(score);
-	
-	
 	CheckFreeCells();
 	return deleted;
 }
@@ -439,17 +451,20 @@ void Board::createRandomColours()
 			clear(tempX, tempY);
 			if (emptyCells.empty())
 			{
-				
+				ScoreWriter(score);				
 				System::Windows::Forms::MessageBox::Show("Game Over!!");
 			}
 		}
 		else
 		{
+			ScoreWriter(score);
 			System::Windows::Forms::MessageBox::Show("Game Over!!");
 				return;
 		}
 
 	}
+	state->AddCurrent(score, mBoard);
+	
 }
 void Board::Move(int x, int y)
 {
@@ -480,8 +495,6 @@ void Board::Move(int x, int y)
 		{
 			createRandomColours();
 		}
-	
-
 	}
 }
 

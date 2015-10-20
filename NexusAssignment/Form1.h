@@ -45,7 +45,7 @@ namespace NexusAssignment {
 		}
 	private: System::Windows::Forms::PictureBox^  pictureBox1;
 	private: System::Windows::Forms::Button^  button1;
-
+	
 	private: Board *board;
 			 Graphics^ graphics;
 	private: System::Windows::Forms::Timer^  timer1;
@@ -97,6 +97,7 @@ namespace NexusAssignment {
 			// 
 			// button1
 			// 
+			this->button1->BackColor = System::Drawing::Color::MediumSeaGreen;
 			this->button1->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->button1->Location = System::Drawing::Point(484, 33);
@@ -105,7 +106,7 @@ namespace NexusAssignment {
 			this->button1->Size = System::Drawing::Size(94, 37);
 			this->button1->TabIndex = 1;
 			this->button1->Text = L"Restart";
-			this->button1->UseVisualStyleBackColor = true;
+			this->button1->UseVisualStyleBackColor = false;
 			this->button1->Click += gcnew System::EventHandler(this, &Form1::button1_Click);
 			// 
 			// timer1
@@ -136,6 +137,7 @@ namespace NexusAssignment {
 			// 
 			// button2
 			// 
+			this->button2->BackColor = System::Drawing::Color::SandyBrown;
 			this->button2->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->button2->Location = System::Drawing::Point(484, 90);
@@ -144,17 +146,21 @@ namespace NexusAssignment {
 			this->button2->Size = System::Drawing::Size(94, 37);
 			this->button2->TabIndex = 4;
 			this->button2->Text = L"Quit";
-			this->button2->UseVisualStyleBackColor = true;
+			this->button2->UseVisualStyleBackColor = false;
 			this->button2->Click += gcnew System::EventHandler(this, &Form1::button2_Click);
 			// 
 			// button3
 			// 
+			this->button3->BackColor = System::Drawing::Color::LightCoral;
+			this->button3->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, static_cast<System::Drawing::FontStyle>((System::Drawing::FontStyle::Bold | System::Drawing::FontStyle::Italic)),
+				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
 			this->button3->Location = System::Drawing::Point(484, 334);
 			this->button3->Name = L"button3";
 			this->button3->Size = System::Drawing::Size(96, 54);
 			this->button3->TabIndex = 5;
-			this->button3->Text = L"button3";
-			this->button3->UseVisualStyleBackColor = true;
+			this->button3->Text = L"UNDO";
+			this->button3->UseVisualStyleBackColor = false;
+			this->button3->Click += gcnew System::EventHandler(this, &Form1::button3_Click);
 			// 
 			// label3
 			// 
@@ -208,6 +214,7 @@ namespace NexusAssignment {
 				 timer1->Enabled = true;
 				 board->createRandomColours();
 				 label4->Text = Convert::ToString(board->getHighScore());
+				 
 	}
 
 	private: System::Void timer1_Tick(System::Object^  sender, System::EventArgs^  e) {
@@ -222,6 +229,7 @@ namespace NexusAssignment {
 				 Drawer::init(graphics);
 				 timer1->Enabled = true;
 				 board->createRandomColours();
+				 label4->Text = Convert::ToString(board->getHighScore());
 	}
 
 	private: System::Void pictureBox1_MouseDown(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
@@ -230,6 +238,9 @@ namespace NexusAssignment {
 	private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {
 				 Close();
 	}
+private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e) {
+			 board->MovebackAState();
+}
 };
 }
 

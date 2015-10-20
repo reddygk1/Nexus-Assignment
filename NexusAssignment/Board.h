@@ -1,6 +1,7 @@
 #pragma once
 #ifndef _BOARD
 #define _BOARD
+#include "State.h"
 
 #include <vcclr.h>
 #include <vector>
@@ -29,6 +30,7 @@ class Board
 	int activeCellcolour;
 	int score;
 	int highScore;
+	State* state;
 public:
 	Board();
 	int cellContent(int, int);
@@ -38,12 +40,14 @@ public:
 	bool clear(int, int);
 	void ScoreWriter(int x);
 	int ScoreReader();
+	void HighScore();
 	void activeCellFlicker();
 	void createRandomColours();
 	void Move(int x, int y);
 	void CheckFreeCells();
 	int getScore() { return score; };
 	int getHighScore() { return highScore; }
+	void MovebackAState();
 	~Board();
 };
 
