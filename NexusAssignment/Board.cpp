@@ -1,9 +1,10 @@
+//Board.cpp file.
 #include "stdafx.h"
 #include "Board.h"
 #include "Drawer.h"
 #include "Astar.h"
 
-
+//Constuctor.
 Board::Board()
 {
 	initBoard();
@@ -11,13 +12,16 @@ Board::Board()
 	state = new State;
 }
 
+//Initialising the boared.
 void Board::initBoard()
 {
-	highScore = (ScoreReader());
-	active.x = -1;
-	active.y = -1;
-	activeCellcolour = -1;
+	highScore = (ScoreReader()); // Getting the high score form textfile.
+	active.x = -1;             // Setting the variables out of boundaries, so nothing happens when we use them in methods. 
+	active.y = -1;             //Setting the variables out of boundaries, so nothing happens when we use them in methods.
+	activeCellcolour = -1;    //Setting the variables out of boundaries, so nothing happens when we use them in methods.
 	score = 0;
+
+	//Drawing the cells.
 	for (int i = 0; i < BOARD_HEIGHT; i++)
 	{
 		for (int j = 0; j < BOARD_WIDTH; j++)
@@ -28,9 +32,11 @@ void Board::initBoard()
 			cells[i][j].y = j * BLOCK_SIZE;
 		}
 	}
+	//Checking for freecells.
 	CheckFreeCells();
 }
 
+//Method to check free cells and store them to Vector.
 void Board::CheckFreeCells()
 {
 	emptyCells.clear();
@@ -41,6 +47,7 @@ void Board::CheckFreeCells()
 		{
 			if (mBoard[i][j] ==0)
 			{
+				//Declaring a temorary cell struct to use it as indicator to store in the vector.
 				Cell tempCell;
 				tempCell.x = i;
 				tempCell.y = j;
@@ -51,19 +58,24 @@ void Board::CheckFreeCells()
 	}
 }
 
+// method to move back a state.
 void Board::MovebackAState()
 {
+	//This is to make sure even the selected cell is added to the moveback method.
 	if (active.x != -1 && active.y != -1)
 	{
+		//This is to change theselected cell colour to default.
 		mBoard[active.x][active.y] = activeCellcolour;
 		active.x = -1;
 		active.y = -1;
 		activeCellcolour = -1;
 
 	}
+	//Stoting them in vector, passing in the board and the score.
 	state->MoveBack(score, mBoard);
 }
 
+//This is the method to select a cell.
 void Board::selectCell(int x, int y)
 {
 	for (int i = 0; i < BOARD_HEIGHT; i++)
@@ -72,6 +84,7 @@ void Board::selectCell(int x, int y)
 		{
 			Rectangle^ rect = gcnew Rectangle(cells[i][j].x, cells[i][j].y, BLOCK_SIZE, BLOCK_SIZE);
 
+			//check if the selected cell has a shape, if yes make it flicker.
 			if (rect->Contains(x, y))
 			{
 				//Make it Flicker
@@ -84,10 +97,12 @@ void Board::selectCell(int x, int y)
 				}
 				else
 				{
+					//Checking if they have changes their selection of shape.
 					if (mBoard[i][j] != 0)
 					{
 						if (active.x != -1 && active.y != -1)
 						{
+							//if yes changing the focus onto the currently selected cell and changing the original cell to stop flickering.
 							mBoard[active.x][active.y] = activeCellcolour;
 							active.x = -1;
 							active.y = -1;
@@ -99,44 +114,47 @@ void Board::selectCell(int x, int y)
 					}
 					else
 					{
-						Move(i, j);
-						
-					}
-						
-				}
-				
+						//Once in boundaries and the cell is empty, Move the cell.
+						Move(i, j);						
+					}						
+				}				
 				return;
 			}
 			delete rect;
 		}
 	}
 }
-
+//Taking the inputs of int and returning the particular cell.
 int Board::cellContent(int x, int y)
 {
 	return mBoard[x][y];
 }
 
+//Drawing the shapes.
 void Board::draw()
 {
 		Drawer::draw(*this);
 		activeCellFlicker();
 }
 
+//Method to write the high score to a text file.
 void Board::ScoreWriter(int x)
 {
 	gcroot<IO::StreamWriter^> sw;
 	sw = gcnew IO::StreamWriter("HighScore.txt");
+	//Checking the score is greater than the stored high score, if yes write it to text file.
 	if (score > highScore)
 	{
 		sw->WriteLine(x);
 	}
-	
+	//Close the stream writer.
 	sw->Close();
 }
 
+//Method to Read the text file.
 int Board::ScoreReader()
 {
+	//Read the text file and return it as INT.
 	int srScore;
 	gcroot<IO::StreamReader^> sr;
 	sr = gcnew IO::StreamReader("HighScore.txt");
@@ -144,7 +162,7 @@ int Board::ScoreReader()
 	sr->Close();
 	return srScore;
 }
-
+//Method to check for the Shapes of same colour are in a row and clearing them and increasing the score.
 bool Board::clear(int x,int y)
 {
 	bool deleted = false;
@@ -155,22 +173,24 @@ bool Board::clear(int x,int y)
 	int tempColor = -1;
 	int count = 1;
 	
-
+	//Declaring a temporary cell struct to use it as indicator.
 	Cell tempCell;
 	tempCell.x = tempX;
 	tempCell.y = tempY;
 	eraseShapes.push_back(tempCell);
 
-	// Checking left
+	// Checking left for same colour shapes and storing them into the vector.
 
 	do
 	{
+		//setting the starting point
 		tempX -= 1;
-		if ((tempX >= 0 && tempX < 9) && (tempY >= 0 && tempY < 9))
+		if ((tempX >= 0 && tempX < 9) && (tempY >= 0 && tempY < 9)) // Check if it is inside the boundaries.
 		{
-			tempColor = mBoard[tempX][tempY];
+			tempColor = mBoard[tempX][tempY];// store as temp to compare it with the other shape's colour.
 			if (mBoard[tempX][tempY] == color)
 			{
+				//if the colour is the same then increasin the count.
 				count = +1;
 				Cell tempCell;
 				tempCell.x = tempX;
@@ -181,20 +201,23 @@ bool Board::clear(int x,int y)
 			else
 
 			{
+				// if the colour is not the same then default the temp.
 				tempColor = -1;
 			}		
 	} while (tempColor == color);
 	
-	//Checking Right
+	//Checking Right for same colour shapes and storing them into the vector.
 	tempX = x;
 	do
 	{
+		//setting the starting point
 		tempX += 1;
 		if ((tempX >= 0 && tempX < 9) && (tempY >= 0 && tempY < 9))
 		{
-			tempColor = mBoard[tempX][tempY];
+			tempColor = mBoard[tempX][tempY];// store as temp to compare it with the other shape's colour.
 			if (mBoard[tempX][tempY] == color)
 			{
+				//if the colour is the same then increasin the count.
 				count = +1;
 				Cell tempCell;
 				tempCell.x = tempX;
@@ -205,11 +228,12 @@ bool Board::clear(int x,int y)
 		else
 
 		{
+			// if the colour is not the same then default the temp.
 			tempColor = -1;
 		}
 	} while (tempColor == color);
 
-	//Checking if there are 5 same in a row
+	//Checking if there are 5 same colour ina row and deleting them.
 	if (count < 5)
 	{
 		for (int i = 0; i < count -1; i++)
@@ -218,7 +242,7 @@ bool Board::clear(int x,int y)
 		}
 		 
 	}
-
+	//Setting the variabls back so we can check the other direction
 	count = 1;
 	tempColor = 0;
 	tempX = x;
@@ -227,12 +251,14 @@ bool Board::clear(int x,int y)
 	//Checking Up
 	do
 	{
+		//setting the starting point
 		tempY -= 1;
 		if ((tempX >= 0 && tempX < 9) && (tempY >= 0 && tempY < 9))
 		{
-			tempColor = mBoard[tempX][tempY];
+			tempColor = mBoard[tempX][tempY];// store as temp to compare it with the other shape's colour.
 			if (mBoard[tempX][tempY] == color)
 			{
+				//if the colour is the same then increasin the count.
 				count = +1;
 				Cell tempCell;
 				tempCell.x = tempX;
@@ -243,6 +269,7 @@ bool Board::clear(int x,int y)
 		else
 
 		{
+			// if the colour is not the same then default the temp.
 			tempColor = -1;
 		}
 	} while (tempColor == color);
@@ -251,12 +278,14 @@ bool Board::clear(int x,int y)
 	tempY = y;
 	do
 	{
+		//setting the starting point
 		tempY += 1;
 		if ((tempX >= 0 && tempX < 9) && (tempY >= 0 && tempY < 9))
 		{
-			tempColor = mBoard[tempX][tempY];
+			tempColor = mBoard[tempX][tempY];// store as temp to compare it with the other shape's colour.
 			if (mBoard[tempX][tempY] == color)
 			{
+				//if the colour is the same then increasin the count.
 				count = +1;
 				Cell tempCell;
 				tempCell.x = tempX;
@@ -267,11 +296,12 @@ bool Board::clear(int x,int y)
 		else
 
 		{
+			// if the colour is not the same then default the temp.
 			tempColor = -1;
 		}
 	} while (tempColor == color);
 
-	//Checking if there are 5 same in a row
+	//Checking if there are 5 same colour ina row and deleting them.
 	if (count < 5)
 	{
 		for (int i = 0; i < count - 1; i++)
@@ -288,13 +318,15 @@ bool Board::clear(int x,int y)
 	//Checking Up Right Diagonally
 	do
 	{
+		//setting the starting point
 		tempY -= 1;
 		tempX += 1;
 		if ((tempX >= 0 && tempX < 9) && (tempY >= 0 && tempY < 9))
 		{
-			tempColor = mBoard[tempX][tempY];
+			tempColor = mBoard[tempX][tempY];// store as temp to compare it with the other shape's colour.
 			if (mBoard[tempX][tempY] == color)
 			{
+				//if the colour is the same then increasin the count.
 				count = +1;
 				Cell tempCell;
 				tempCell.x = tempX;
@@ -305,6 +337,7 @@ bool Board::clear(int x,int y)
 		else
 
 		{
+			// if the colour is not the same then default the temp.
 			tempColor = -1;
 		}
 	} while (tempColor == color);
@@ -314,13 +347,15 @@ bool Board::clear(int x,int y)
 	tempX = x;
 	do
 	{
+		//setting the starting point
 		tempY += 1;
 		tempX -= 1;
 		if ((tempX >= 0 && tempX < 9) && (tempY >= 0 && tempY < 9))
 		{
-			tempColor = mBoard[tempX][tempY];
+			tempColor = mBoard[tempX][tempY];// store as temp to compare it with the other shape's colour.
 			if (mBoard[tempX][tempY] == color)
 			{
+				//if the colour is the same then increasin the count.
 				count = +1;
 				Cell tempCell;
 				tempCell.x = tempX;
@@ -331,11 +366,12 @@ bool Board::clear(int x,int y)
 		else
 
 		{
+			// if the colour is not the same then default the temp.
 			tempColor = -1;
 		}
 	} while (tempColor == color);
 
-	//Checking if there are 5 same in a row
+	//Checking if there are 5 same colour ina row and deleting them.
 	if (count < 5)
 	{
 		for (int i = 0; i < count - 1; i++)
@@ -343,7 +379,7 @@ bool Board::clear(int x,int y)
 			eraseShapes.pop_back();
 		}
 	}
-
+	//Setting the variabls back so we can check the other direction
 	count = 1;
 	tempColor = 0;
 	tempX = x;
@@ -352,13 +388,15 @@ bool Board::clear(int x,int y)
 	//Checking Up Left Diagonally
 	do
 	{
+		//setting the starting point
 		tempY -= 1;
 		tempX -= 1;
 		if ((tempX >= 0 && tempX < 9) && (tempY >= 0 && tempY < 9))
 		{
-			tempColor = mBoard[tempX][tempY];
+			tempColor = mBoard[tempX][tempY];// store as temp to compare it with the other shape's colour.
 			if (mBoard[tempX][tempY] == color)
 			{
+				//if the colour is the same then increasin the count.
 				count = +1;
 				Cell tempCell;
 				tempCell.x = tempX;
@@ -369,6 +407,7 @@ bool Board::clear(int x,int y)
 		else
 
 		{
+			// if the colour is not the same then default the temp.
 			tempColor = -1;
 		}
 	} while (tempColor == color);
@@ -378,13 +417,15 @@ bool Board::clear(int x,int y)
 	tempX = x;
 	do
 	{
+		//setting the starting point
 		tempY += 1;
 		tempX += 1;
 		if ((tempX >= 0 && tempX < 9) && (tempY >= 0 && tempY < 9))
 		{
-			tempColor = mBoard[tempX][tempY];
+			tempColor = mBoard[tempX][tempY];// store as temp to compare it with the other shape's colour.
 			if (mBoard[tempX][tempY] == color)
 			{
+				//if the colour is the same then increasin the count.
 				count = +1;
 				Cell tempCell;
 				tempCell.x = tempX;
@@ -395,11 +436,12 @@ bool Board::clear(int x,int y)
 		else
 
 		{
+			// if the colour is not the same then default the temp.
 			tempColor = -1;
 		}
 	} while (tempColor == color);
 
-	//Checking if there are 5 same in a row
+	//Checking if there are 5 same colour ina row and deleting them.
 	if (count < 5)
 	{
 		for (int i = 0; i < count - 1; i++)
@@ -407,7 +449,7 @@ bool Board::clear(int x,int y)
 			eraseShapes.pop_back();
 		}
 	}
-
+	//Erasing the shapes after completing the checking.
 	if (eraseShapes.size()>=5)
 	{
 		deleted = true;
@@ -415,12 +457,15 @@ bool Board::clear(int x,int y)
 		{
 			mBoard[eraseShapes[i].x][eraseShapes[i].y] = 0;
 		}
+		//Updating the score.
 		score = score + eraseShapes.size()*10;
 	}
+	//Update farecells after deleting.
 	CheckFreeCells();
 	return deleted;
 }
 
+//Method to flicker the active cell.
 void Board::activeCellFlicker()
 {
 	if (active.x != -1 && active.y != -1)
@@ -436,6 +481,7 @@ void Board::activeCellFlicker()
 		
 	}
 }
+//This is the method to create 3 random clears.
 void Board::createRandomColours()
 {
 	for (int i = 0; i < 3; i++)
@@ -449,6 +495,7 @@ void Board::createRandomColours()
 			int tempY = emptyCells[space].y;
 			CheckFreeCells();
 			clear(tempX, tempY);
+			//If there are no more empty cells, display Game over.
 			if (emptyCells.empty())
 			{
 				ScoreWriter(score);				
@@ -463,9 +510,11 @@ void Board::createRandomColours()
 		}
 
 	}
+	//Add to state vector.
 	state->AddCurrent(score, mBoard);
 	
 }
+//Method to move the shapes.
 void Board::Move(int x, int y)
 {
 	string Path = aStar::pathFind(active.x, active.y, x, y, mBoard);

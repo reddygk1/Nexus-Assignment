@@ -1,4 +1,15 @@
+/******************************************************************************************************************
+* Program      : Nexus                                                                                            *
+* Programmed by: Gowtham Reddy                                                                                    *
+* Language     : C++                                                                                              *
+*                                                                                                                 *
+* This Class   : Form Class                                                                                       *
+* Purpose      : Creating objects and running all the methods on Timer tick and button click.                     *
+*                                                                                                                 *
+* *****************************************************************************************************************/
 #pragma once
+
+//Including Board and Drawer classes to FORM.
 #include "Board.h"
 #include "Drawer.h"
 
@@ -45,7 +56,7 @@ namespace NexusAssignment {
 		}
 	private: System::Windows::Forms::PictureBox^  pictureBox1;
 	private: System::Windows::Forms::Button^  button1;
-	
+	//Initialising Board
 	private: Board *board;
 			 Graphics^ graphics;
 	private: System::Windows::Forms::Timer^  timer1;
@@ -207,21 +218,22 @@ namespace NexusAssignment {
 
 		}
 #pragma endregion
+		//Declaring methods for the game to load on Form load.
 	private: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e) {
 				 board = new Board();
 				 graphics = pictureBox1->CreateGraphics();
 				 Drawer::init(graphics);
 				 timer1->Enabled = true;
 				 board->createRandomColours();
-				 label4->Text = Convert::ToString(board->getHighScore());
-				 
+				 label4->Text = Convert::ToString(board->getHighScore());				 
 	}
+			 //Every timer tick Board refreshes and the score is updated.
 
 	private: System::Void timer1_Tick(System::Object^  sender, System::EventArgs^  e) {
 				 board->draw();
 				 label2->Text = Convert::ToString(board->getScore());
 	}
-
+			 // Button 1 restarts the game by loading the form again.
 	private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
 				
 				 board = new Board();
@@ -231,13 +243,15 @@ namespace NexusAssignment {
 				 board->createRandomColours();
 				 label4->Text = Convert::ToString(board->getHighScore());
 	}
-
+			 //Mouse down selects the pic of the shape to be moved.
 	private: System::Void pictureBox1_MouseDown(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
 				 board->selectCell(e->X, e->Y);
 	}
+			 // Button 2 is to quit, this closes the form.
 	private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {
 				 Close();
 	}
+			 //Button 3 calles the undo method, which takes the game back a stage.
 private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e) {
 			 board->MovebackAState();
 }

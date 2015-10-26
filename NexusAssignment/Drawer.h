@@ -1,10 +1,11 @@
+//Drawer Header file.
 #pragma once
 #ifndef _DRAWER
 #define _DRAWER
 #include "Board.h"
 
 using namespace System::Drawing;
-
+//Declaring the images for the game.
 ref class Drawer
 {
 	static array<Bitmap^>^ ball = {
@@ -17,10 +18,12 @@ ref class Drawer
 		(Bitmap^)Image::FromFile("img\\bleau.png"),
 		(Bitmap^)Image::FromFile("img\\selected.png"),
 	};
+	//Also declaring pens(graphics) for different shapes (Outlines etc.)
 	static Pen^ border = gcnew Pen(Color::White);
 	static Pen^ outline = gcnew Pen(Color::Black);
 	static Graphics^ formGraphics;
 public:
+	//Methods.
 	static void init(Graphics^);
 	static void draw(Board&);
 };
